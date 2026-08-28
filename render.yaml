@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mahasetu-backend
+    runtime: java
+    rootDir: backend
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/mahasetu-interop-backend-1.0.0-phase2.jar
+    envVars:
+      - key: SERVER_PORT
+        value: 10000
+      - key: JAVA_VERSION
+        value: 21
