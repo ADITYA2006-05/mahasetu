@@ -4,7 +4,7 @@ services:
     name: mahasetu-backend
     runtime: java
     rootDir: backend
-    buildCommand: chmod +x ./mvnw && export JAVA_HOME=/usr/lib/jvm/java-21-openjdk && ./mvnw clean package -DskipTests
+    buildCommand: chmod +x ./mvnw && ./mvnw clean package -DskipTests
     startCommand: java -jar target/mahasetu-interop-backend-1.0.0-phase2.jar
     envVars:
       - key: SERVER_PORT
