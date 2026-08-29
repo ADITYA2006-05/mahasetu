@@ -1,0 +1,50 @@
+# Fly.io application configuration for MahaSetu
+# https://fly.io/docs/reference/config/
+
+[build]
+  # Build the backend Java app
+  image = "registry.fly.io/mahasetu-backend:latest"
+
+  # Build command - use Maven with JAVA_HOME
+  pull_policy = "always"
+
+[[services]]
+  # Backend Java service
+  tcp_checks = []
+  http_checks = []
+  uri = "/api/health"
+  
+  # Port Fly.io assigns
+  internal_port = 8080
+  
+  # Environment variables
+  env = {
+    JAVA_VERSION = "21",
+    JAVA_HOME = "/usr/lib/jvm/java-21-openjdk",
+    SERVER_PORT = "10000",
+    # Use H2 in-memory mode for zero-dependency deployment
+    SPRING_DATASOURCE_URL = "jdbc:h2:mem:mahasetu_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1",
+    DB_USER = "sa",
+    DB_PASSWORD = "",
+  }
+
+[[services]]
+  # Frontend static site
+  internal_port = 5173
+  
+  # Proxy to the backend
+  [[services.protocols]]
+    port = 80
+    handlers = ["reverse_proxy"]
+  
+  # For Fly.io, proxy to backend on port 8080
+  [[services.protocols]]
+    port = 8080
+    handlers = ["tls", "tcp"]
+  
+  # Optional: enable internal routing
+  auto_start = true
+  
+  # Scale settings
+  min_machines = 1
+  max_machines = 3
