@@ -19,6 +19,7 @@ import { DemoPage } from './components/demo/DemoPage';
 import { DataExplorerModal } from './components/DataExplorerModal';
 import { ApiInspectorModal } from './components/ApiInspectorModal';
 import { PlatformStats } from './types';
+import { API_BASE_URL } from './config/api';
 import { 
   Menu, 
   ShieldAlert, 
@@ -55,7 +56,7 @@ const MainApplication: React.FC = () => {
   // Fetch background platform stats for modals
   useEffect(() => {
     if (!token || !isAuthenticated) return;
-    fetch('http://localhost:8080/api/stats', {
+    fetch(`${API_BASE_URL}/api/stats`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.ok ? res.json() : null)

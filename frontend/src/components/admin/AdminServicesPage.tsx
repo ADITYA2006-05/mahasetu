@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { ServiceHealthItem } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   Cpu, 
   Search, 
@@ -21,7 +22,7 @@ export const AdminServicesPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/services', {
+      const res = await fetch(`${API_BASE_URL}/api/services`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',

@@ -298,7 +298,7 @@ export const ApiInspectorModal: React.FC<ApiInspectorModalProps> = ({
         <div className="p-3 px-6 border-t border-slate-300 bg-slate-50 flex items-center justify-between text-xs text-slate-800 font-bold">
           <div className="flex items-center gap-3">
             <a
-              href="http://localhost:8080/swagger-ui.html"
+              href="https://mahasetu-production.up.railway.app/swagger-ui.html"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs transition-colors"

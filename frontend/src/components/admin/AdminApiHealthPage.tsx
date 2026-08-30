@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { SystemMonitoring } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   Activity, 
   AlertTriangle, 
@@ -22,7 +23,7 @@ export const AdminApiHealthPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/monitoring/health', {
+      const res = await fetch(`${API_BASE_URL}/api/monitoring/health`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
@@ -47,7 +48,7 @@ export const AdminApiHealthPage: React.FC = () => {
     const nextStatus = currentStatus === 'ONLINE' ? 'OFFLINE' : 'ONLINE';
     setToggling(deptCode);
     try {
-      const res = await fetch(`http://localhost:8080/api/mock/admin/departments/${deptCode}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/${deptCode}/status`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,

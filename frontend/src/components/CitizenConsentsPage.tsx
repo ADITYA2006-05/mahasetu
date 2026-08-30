@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ConsentItem, CreateConsentPayload } from '../types';
+import { API_BASE_URL } from '../config/api';
 import { 
   ShieldCheck, 
   Plus, 
@@ -44,7 +45,7 @@ export const CitizenConsentsPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/consents', {
+      const res = await fetch(`${API_BASE_URL}/api/consents`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
@@ -71,7 +72,7 @@ export const CitizenConsentsPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:8080/api/consents/${id}/revoke`, {
+      const res = await fetch(`${API_BASE_URL}/api/consents/${id}/revoke`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,7 +107,7 @@ export const CitizenConsentsPage: React.FC = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/api/consents', {
+      const res = await fetch(`${API_BASE_URL}/api/consents`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

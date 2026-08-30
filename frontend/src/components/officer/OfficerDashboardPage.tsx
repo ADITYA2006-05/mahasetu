@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { OfficerStats } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   FileCheck, 
   CheckCircle2, 
@@ -25,7 +26,7 @@ export const OfficerDashboardPage: React.FC<OfficerDashboardPageProps> = ({ onNa
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/officer/stats', {
+      const res = await fetch(`${API_BASE_URL}/api/officer/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',

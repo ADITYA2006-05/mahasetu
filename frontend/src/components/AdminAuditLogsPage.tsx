@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { AuditLogItem } from '../types';
+import { API_BASE_URL } from '../config/api';
 import { 
   FileText, 
   Search, 
@@ -37,7 +38,7 @@ export const AdminAuditLogsPage: React.FC = () => {
       if (deptFilter !== 'ALL') params.append('department', deptFilter);
       if (statusFilter !== 'ALL') params.append('status', statusFilter);
 
-      const url = `http://localhost:8080/api/audit-logs${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `${API_BASE_URL}/api/audit-logs${params.toString() ? `?${params.toString()}` : ''}`;
       const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,

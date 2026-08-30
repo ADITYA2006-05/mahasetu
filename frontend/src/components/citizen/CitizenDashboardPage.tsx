@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CitizenProfileData } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   UserCheck, 
   ShieldCheck, 
@@ -30,7 +31,7 @@ export const CitizenDashboardPage: React.FC<CitizenDashboardPageProps> = ({ onNa
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/citizen/profile', {
+      const res = await fetch(`${API_BASE_URL}/api/citizen/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CitizenDataAccessItem } from '../types';
+import { API_BASE_URL } from '../config/api';
 import { 
   Eye, 
   ShieldCheck, 
@@ -22,7 +23,7 @@ export const CitizenDataAccessPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/citizen/data-access', {
+      const res = await fetch(`${API_BASE_URL}/api/citizen/data-access`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',

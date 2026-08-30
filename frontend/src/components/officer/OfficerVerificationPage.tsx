@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { IntegrationResponse } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   FileCheck, 
   Search, 
@@ -67,7 +68,7 @@ export const OfficerVerificationPage: React.FC = () => {
       setTimeout(() => setCurrentStep(2), 250);
       setTimeout(() => setCurrentStep(3), 500);
 
-      const res = await fetch('http://localhost:8080/api/integration/request', {
+      const res = await fetch(`${API_BASE_URL}/api/integration/request`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

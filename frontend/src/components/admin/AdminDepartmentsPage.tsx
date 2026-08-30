@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { DepartmentStat } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   Building2, 
   FileText, 
@@ -29,10 +30,10 @@ export const AdminDepartmentsPage: React.FC = () => {
     setError(null);
     try {
       const [deptRes, statusRes] = await Promise.all([
-        fetch('http://localhost:8080/api/departments', {
+        fetch(`${API_BASE_URL}/api/departments`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch('http://localhost:8080/api/mock/admin/departments/status', {
+        fetch(`${API_BASE_URL}/api/mock/admin/departments/status`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -66,7 +67,7 @@ export const AdminDepartmentsPage: React.FC = () => {
     const nextStatus = current === 'ONLINE' ? 'OFFLINE' : 'ONLINE';
     setToggling(deptCode);
     try {
-      const res = await fetch(`http://localhost:8080/api/mock/admin/departments/${deptCode}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/${deptCode}/status`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,

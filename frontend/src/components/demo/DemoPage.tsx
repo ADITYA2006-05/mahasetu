@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { IntegrationResponse } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   PlayCircle, 
   CheckCircle2, 
@@ -34,24 +35,24 @@ export const DemoPage: React.FC = () => {
     try {
       // 1. Configure Gateway Statuses
       if (simulateFailure) {
-        await fetch('http://localhost:8080/api/mock/admin/departments/AGR/status', {
+        await fetch(`${API_BASE_URL}/api/mock/admin/departments/AGR/status`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'OFFLINE' }),
         });
       } else {
         await Promise.all([
-          fetch('http://localhost:8080/api/mock/admin/departments/REV/status', {
+          fetch(`${API_BASE_URL}/api/mock/admin/departments/REV/status`, {
             method: 'PUT',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'ONLINE' }),
           }),
-          fetch('http://localhost:8080/api/mock/admin/departments/AGR/status', {
+          fetch(`${API_BASE_URL}/api/mock/admin/departments/AGR/status`, {
             method: 'PUT',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'ONLINE' }),
           }),
-          fetch('http://localhost:8080/api/mock/admin/departments/WEL/status', {
+          fetch(`${API_BASE_URL}/api/mock/admin/departments/WEL/status`, {
             method: 'PUT',
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'ONLINE' }),
@@ -65,7 +66,7 @@ export const DemoPage: React.FC = () => {
       // Step 3: Federated Integration Dispatch
       setTimeout(() => setDemoStep(3), 600);
 
-      const res = await fetch('http://localhost:8080/api/integration/request', {
+      const res = await fetch(`${API_BASE_URL}/api/integration/request`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,7 +93,7 @@ export const DemoPage: React.FC = () => {
           
           // Fetch latest audit record
           try {
-            const auditRes = await fetch('http://localhost:8080/api/audit/logs?limit=1', {
+            const auditRes = await fetch(`${API_BASE_URL}/api/audit-logs`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (auditRes.ok) {
@@ -115,7 +116,7 @@ export const DemoPage: React.FC = () => {
 
   const resetAllGatewaysOnline = async () => {
     if (!token) return;
-    await fetch('http://localhost:8080/api/mock/admin/departments/AGR/status', {
+    await fetch(`${API_BASE_URL}/api/mock/admin/departments/AGR/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'ONLINE' }),

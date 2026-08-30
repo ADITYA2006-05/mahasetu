@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { PlatformStats } from '../../types';
+import { API_BASE_URL } from '../../config/api';
 import { 
   Activity, 
   RefreshCw, 
@@ -39,7 +40,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/stats', {
+      const res = await fetch(`${API_BASE_URL}/api/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
