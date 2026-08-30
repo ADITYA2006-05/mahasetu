@@ -13,13 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/health")
 @RequiredArgsConstructor
 public class HealthController {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @GetMapping
+    @GetMapping({"/", "/api/health"})
     public ResponseEntity<HealthResponseDto> getHealth() {
         String dbStatus = "CONNECTED";
         String dialect = "PostgreSQL";

@@ -66,8 +66,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public Health & Pre-flight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/", "/api/health", "/api/health/**").permitAll()
                 .requestMatchers("/error", "/error/**").permitAll()
-                .requestMatchers("/api/health", "/api/health/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 
                 // Public Swagger UI & OpenAPI Docs
