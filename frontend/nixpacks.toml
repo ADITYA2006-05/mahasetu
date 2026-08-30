@@ -1,0 +1,12 @@
+# Nixpacks configuration for frontend service (when Root Directory is /frontend)
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.build]
+cmds = [
+  "npm install",
+  "npm run build"
+]
+
+[start]
+cmd = "npx serve -s dist -l $PORT"
