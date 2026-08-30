@@ -3,9 +3,6 @@ set -e
 
 cd "$(dirname "$0")"
 
-# Set JAVA_HOME for Maven
-export JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
-
 # Build the backend (Spring Boot) using Maven wrapper
 cd backend
 chmod +x ./mvnw
