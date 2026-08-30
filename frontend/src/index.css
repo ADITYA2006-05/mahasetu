@@ -8,17 +8,7 @@
   }
   
   body {
-    @apply bg-slate-100 text-slate-950 transition-colors duration-200;
-    color: #020617; /* Solid Black */
-  }
-  
-  html.dark body {
-    @apply bg-slate-200 text-slate-950;
-    color: #020617; /* Solid Black */
-  }
-
-  h1, h2, h3, h4, h5, h6, p, span, label, input, button, table, th, td, code, pre {
-    color: #020617; /* Default to high-contrast black font */
+    @apply bg-slate-100 text-slate-900 antialiased;
   }
 }
 
@@ -33,9 +23,9 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-400 rounded-full;
+  @apply bg-slate-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-500;
+  @apply bg-slate-400;
 }

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SchemaMappingItem } from '../types';
+import { API_BASE_URL } from '../config/api';
 
 export const AdminSchemaMappingsPage: React.FC = () => {
   const { token, user } = useAuth();
@@ -73,8 +74,8 @@ export const AdminSchemaMappingsPage: React.FC = () => {
     setError(null);
     try {
       const url = selectedDept === 'ALL' 
-        ? '/api/schema-mappings' 
-        : `/api/schema-mappings?departmentCode=${selectedDept}`;
+        ? `${API_BASE_URL}/api/schema-mappings` 
+        : `${API_BASE_URL}/api/schema-mappings?departmentCode=${selectedDept}`;
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -132,8 +133,8 @@ export const AdminSchemaMappingsPage: React.FC = () => {
 
     try {
       const url = editingMapping?.id 
-        ? `/api/schema-mappings/${editingMapping.id}` 
-        : '/api/schema-mappings';
+        ? `${API_BASE_URL}/api/schema-mappings/${editingMapping.id}` 
+        : `${API_BASE_URL}/api/schema-mappings`;
       const method = editingMapping?.id ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -162,7 +163,7 @@ export const AdminSchemaMappingsPage: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this schema mapping rule?')) return;
 
     try {
-      const res = await fetch(`/api/schema-mappings/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/schema-mappings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -193,7 +194,7 @@ export const AdminSchemaMappingsPage: React.FC = () => {
         return;
       }
 
-      const res = await fetch('/api/schema-mappings/transform', {
+      const res = await fetch(`${API_BASE_URL}/api/schema-mappings/transform`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

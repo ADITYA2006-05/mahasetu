@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Power, RefreshCw, Play, Landmark, Sprout, HeartHandshake } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 interface DeptStatus {
   departmentCode: string;
@@ -28,7 +29,7 @@ export const DepartmentSimulatorWidget: React.FC = () => {
   const fetchStatuses = async () => {
     if (!token || !isAdmin) return;
     try {
-      const res = await fetch('/api/mock/admin/departments/status', {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -53,7 +54,7 @@ export const DepartmentSimulatorWidget: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/mock/admin/departments/${deptCode}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/${deptCode}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -79,9 +80,9 @@ export const DepartmentSimulatorWidget: React.FC = () => {
     setTestHttpCode(null);
 
     let url = '';
-    if (deptCode === 'REV') url = '/api/mock/revenue/citizens/MH-CIT-10001';
-    else if (deptCode === 'AGR') url = '/api/mock/agriculture/farmers/MH-CIT-10001';
-    else if (deptCode === 'WEL') url = '/api/mock/welfare/beneficiaries/MH-CIT-10001';
+    if (deptCode === 'REV') url = `${API_BASE_URL}/api/mock/revenue/citizens/MH-CIT-10001`;
+    else if (deptCode === 'AGR') url = `${API_BASE_URL}/api/mock/agriculture/farmers/MH-CIT-10001`;
+    else if (deptCode === 'WEL') url = `${API_BASE_URL}/api/mock/welfare/beneficiaries/MH-CIT-10001`;
 
     try {
       const res = await fetch(url);

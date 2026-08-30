@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { CitizenConsentsPage } from './CitizenConsentsPage';
 import { CitizenDataAccessPage } from './CitizenDataAccessPage';
 import { UserCheck, FileText, Sprout, HeartHandshake, ShieldAlert, Lock, CheckCircle2, ShieldCheck, Eye, Layers } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 interface CitizenPortalProps {
   activeSubView?: 'entitlements' | 'consents' | 'data-access';
@@ -30,7 +31,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   const testRbacProtection = async () => {
     setProbeStatus('testing');
     try {
-      const res = await fetch('/api/stats', {
+      const res = await fetch(`${API_BASE_URL}/api/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

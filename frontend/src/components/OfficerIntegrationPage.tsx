@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { IntegrationResponse, DepartmentResponseItem } from '../types';
+import { API_BASE_URL } from '../config/api';
 import { 
   Network, 
   Send, 
@@ -49,7 +50,7 @@ export const OfficerIntegrationPage: React.FC = () => {
   const fetchHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/integration/history', {
+      const res = await fetch(`${API_BASE_URL}/api/integration/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -64,7 +65,7 @@ export const OfficerIntegrationPage: React.FC = () => {
   const fetchDepartmentStatuses = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/mock/admin/departments/status', {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -91,7 +92,7 @@ export const OfficerIntegrationPage: React.FC = () => {
     const nextStatus = current === 'ONLINE' ? 'OFFLINE' : 'ONLINE';
     setTogglingDept(deptCode);
     try {
-      const res = await fetch(`/api/mock/admin/departments/${deptCode}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/mock/admin/departments/${deptCode}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -122,7 +123,7 @@ export const OfficerIntegrationPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch('/api/integration/request', {
+      const res = await fetch(`${API_BASE_URL}/api/integration/request`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
