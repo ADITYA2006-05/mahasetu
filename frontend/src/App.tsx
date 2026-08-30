@@ -64,6 +64,20 @@ const MainApplication: React.FC = () => {
       .catch(() => {});
   }, [token, isAuthenticated]);
 
+  // Redirect when user logs in
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    const isCitizen = user.roles?.includes('ROLE_CITIZEN');
+    const isOfficer = user.roles?.some(r => r === 'ROLE_DEPARTMENT_OFFICER');
+    const isAdmin = user.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_SYSTEM');
+
+    if (currentPath === '/' || currentPath === '/login') {
+      if (isCitizen) navigate('/citizen/dashboard');
+      else if (isOfficer) navigate('/officer/dashboard');
+      else if (isAdmin) navigate('/admin/dashboard');
+    }
+  }, [isAuthenticated, user]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-100">
@@ -77,10 +91,7 @@ const MainApplication: React.FC = () => {
 
   if (!isAuthenticated) {
     return <LoginPage onSuccess={() => {
-      // Direct to role default
-      if (user?.roles?.includes('ROLE_CITIZEN')) navigate('/citizen/dashboard');
-      else if (user?.roles?.includes('ROLE_DEPARTMENT_OFFICER')) navigate('/officer/dashboard');
-      else navigate('/admin/dashboard');
+      // Handled by reactive useEffect
     }} />;
   }
 
