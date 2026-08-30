@@ -1,0 +1,12 @@
+# Nixpacks configuration for backend service (when Root Directory is /backend)
+[phases.setup]
+nixPkgs = ["jdk21", "maven"]
+
+[phases.build]
+cmds = [
+  "chmod +x ./mvnw",
+  "./mvnw clean package -DskipTests"
+]
+
+[start]
+cmd = "java -jar target/mahasetu-interop-backend-1.0.0-phase2.jar"

@@ -1,0 +1,11 @@
+# Nixpacks configuration for Railway deployment
+[phases.setup]
+nixPkgs = ["jdk21", "maven"]
+
+[phases.build]
+cmds = [
+  "cd backend && chmod +x ./mvnw && ./mvnw clean package -DskipTests"
+]
+
+[start]
+cmd = "java -jar backend/target/mahasetu-interop-backend-1.0.0-phase2.jar"

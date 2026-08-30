@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd backend && chmod +x ./mvnw && ./mvnw clean package -DskipTests"
+
+[deploy]
+startCommand = "java -jar backend/target/mahasetu-interop-backend-1.0.0-phase2.jar"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
