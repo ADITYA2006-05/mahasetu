@@ -1,3 +1,6 @@
 {
-  "build": "cd backend && ./mvnw clean package -DskipTests"
+  "build": {
+    "command": "cd backend && ./mvnw clean package -DskipTests",
+    "workingDir": "."
+  }
 }
