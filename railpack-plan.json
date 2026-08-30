@@ -1,3 +1,5 @@
 {
-  "command": "cd backend && ./mvnw clean package -DskipTests"
+  "scripts": {
+    "build": "cd backend && ./mvnw clean package -DskipTests"
+  }
 }
