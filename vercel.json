@@ -4,6 +4,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://mahasetu-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/actuator/:path*",
+      "destination": "https://mahasetu-production.up.railway.app/actuator/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
