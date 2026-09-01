@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Key, UserCheck, AlertCircle, ArrowRight, Building2, UserPlus, Lock, User, CheckCircle2, Shield } from 'lucide-react';
 
 interface LoginPageProps {
-  onSuccess?: () => void;
+  onSuccess?: (targetRole?: string) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
@@ -14,6 +14,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
 
   // Register form state
+  const [regRole, setRegRole] = useState<'ROLE_CITIZEN' | 'ROLE_DEPARTMENT_OFFICER' | 'ROLE_ADMIN'>('ROLE_CITIZEN');
+  const [regDeptCode, setRegDeptCode] = useState<string>('REV');
   const [regUsername, setRegUsername] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -75,7 +77,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     clearError();
     setLocalError(null);
     const ok = await login(account.username, account.pass);
-    if (ok && onSuccess) onSuccess();
+    if (ok && onSuccess) {
+      const role = account.roleBadge === 'ADMIN' ? 'ROLE_ADMIN' : account.roleBadge === 'CITIZEN' ? 'ROLE_CITIZEN' : 'ROLE_DEPARTMENT_OFFICER';
+      onSuccess(role);
+    }
   };
 
   const handleStandardLogin = async (e: React.FormEvent) => {
@@ -107,16 +112,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
       return;
     }
 
-    const ok = await register({
-      username: regUsername,
-      email: regEmail,
+    const payload: any = {
+      username: regUsername.trim().toLowerCase(),
+      email: regEmail.trim().toLowerCase(),
       password: regPassword,
-      fullName: regFullName,
-      phone: regPhone,
-      citizenId: regCitizenId || undefined
-    });
+      fullName: regFullName.trim(),
+      phone: regPhone.trim() || undefined,
+      role: regRole,
+    };
 
-    if (ok && onSuccess) onSuccess();
+    if (regRole === 'ROLE_DEPARTMENT_OFFICER') {
+      payload.departmentCode = regDeptCode;
+    } else if (regRole === 'ROLE_CITIZEN') {
+      payload.citizenId = regCitizenId.trim() || 'MH-CIT-10001';
+    }
+
+    const ok = await register(payload);
+    if (ok && onSuccess) onSuccess(regRole);
   };
 
   return (
@@ -180,7 +192,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                     : 'text-slate-700 hover:text-slate-950'
                 }`}
               >
-                Citizen Register
+                Register Account
               </button>
             </div>
           </div>
@@ -298,10 +310,105 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
             </div>
           )}
 
-          {/* Tab 3: Citizen Registration */}
+          {/* Tab 3: Account Registration */}
           {activeTab === 'register' && (
             <div className="p-6 sm:p-8 max-w-lg mx-auto">
-              <form onSubmit={handleRegister} className="space-y-3">
+              <form onSubmit={handleRegister} className="space-y-3.5">
+                {/* Account Role Selector */}
+                <div>
+                  <label className="block text-xs font-black text-slate-950 mb-1.5">
+                    Account Classification (RBAC Role) *
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRegRole('ROLE_CITIZEN')}
+                      className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                        regRole === 'ROLE_CITIZEN'
+                          ? 'bg-amber-100 border-amber-600 text-amber-950 font-black shadow-xs'
+                          : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 font-bold'
+                      }`}
+                    >
+                      <UserCheck className="w-4 h-4 mx-auto mb-1 text-amber-700" />
+                      <span className="text-[11px] block">Citizen</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRegRole('ROLE_DEPARTMENT_OFFICER')}
+                      className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                        regRole === 'ROLE_DEPARTMENT_OFFICER'
+                          ? 'bg-amber-100 border-amber-600 text-amber-950 font-black shadow-xs'
+                          : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 font-bold'
+                      }`}
+                    >
+                      <Building2 className="w-4 h-4 mx-auto mb-1 text-amber-700" />
+                      <span className="text-[11px] block">Officer</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRegRole('ROLE_ADMIN')}
+                      className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                        regRole === 'ROLE_ADMIN'
+                          ? 'bg-amber-100 border-amber-600 text-amber-950 font-black shadow-xs'
+                          : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 font-bold'
+                      }`}
+                    >
+                      <Shield className="w-4 h-4 mx-auto mb-1 text-amber-700" />
+                      <span className="text-[11px] block">Administrator</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Conditional Department Selector for Officers */}
+                {regRole === 'ROLE_DEPARTMENT_OFFICER' && (
+                  <div className="p-3 bg-amber-50/80 border border-amber-300 rounded-lg">
+                    <label className="block text-xs font-black text-amber-950 mb-1">
+                      Assigned Department *
+                    </label>
+                    <select
+                      value={regDeptCode}
+                      onChange={(e) => setRegDeptCode(e.target.value)}
+                      className="w-full bg-white border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
+                    >
+                      <option value="REV">REV — Revenue & Forest (7/12 Land Records)</option>
+                      <option value="AGR">AGR — Dept of Agriculture (Kisan Schemes)</option>
+                      <option value="WEL">WEL — Social Welfare (DBT & Stipends)</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Conditional Citizen ID for Citizens */}
+                {regRole === 'ROLE_CITIZEN' && (
+                  <div className="p-3 bg-sky-50/80 border border-sky-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-black text-sky-950">
+                        Citizen ID (Canonical Mapping)
+                      </label>
+                      <span className="text-[10px] text-sky-700 font-bold">Auto-links records</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={regCitizenId}
+                      onChange={(e) => setRegCitizenId(e.target.value)}
+                      placeholder="MH-CIT-10001 (Default Seeded Record)"
+                      className="w-full bg-white border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
+                    />
+                    <p className="text-[10px] text-sky-800 mt-1 font-medium">
+                      Defaults to MH-CIT-10001 with pre-federated land, agriculture, and welfare ledgers.
+                    </p>
+                  </div>
+                )}
+
+                {/* Administrator Role Info */}
+                {regRole === 'ROLE_ADMIN' && (
+                  <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-950 text-xs font-medium flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-rose-700 shrink-0" />
+                    <span>Grants full system telemetry, security audit logs, and service registry authority.</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-black text-slate-950 mb-1">Username *</label>
@@ -351,41 +458,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-black text-slate-950 mb-1">Password (Min 8 chars) *</label>
-                    <input
-                      type="password"
-                      required
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="••••••••••••"
-                      className="w-full bg-slate-50 border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-black text-slate-950 mb-1">Citizen ID (Optional)</label>
-                    <input
-                      type="text"
-                      value={regCitizenId}
-                      onChange={(e) => setRegCitizenId(e.target.value)}
-                      placeholder="e.g. MH-CIT-10009"
-                      className="w-full bg-slate-50 border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-950 mb-1">Password (Min 8 chars) *</label>
+                  <input
+                    type="password"
+                    required
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-slate-50 border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
+                  />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all text-xs border border-amber-600"
+                  className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all text-xs border border-amber-600 cursor-pointer"
                 >
                   {isLoading ? (
                     <span className="inline-block w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <UserPlus className="w-4 h-4" />
-                      <span>Register Citizen Account</span>
+                      <span>
+                        {regRole === 'ROLE_ADMIN'
+                          ? 'Register Administrator Account'
+                          : regRole === 'ROLE_DEPARTMENT_OFFICER'
+                          ? 'Register Department Officer Account'
+                          : 'Register Citizen Account'}
+                      </span>
                     </>
                   )}
                 </button>

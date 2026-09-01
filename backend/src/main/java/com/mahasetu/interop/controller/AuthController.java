@@ -4,6 +4,7 @@ import com.mahasetu.interop.dto.*;
 import com.mahasetu.interop.entity.Role;
 import com.mahasetu.interop.entity.RoleType;
 import com.mahasetu.interop.entity.User;
+import com.mahasetu.interop.repository.CitizenRepository;
 import com.mahasetu.interop.repository.RoleRepository;
 import com.mahasetu.interop.repository.UserRepository;
 import com.mahasetu.interop.security.JwtTokenProvider;
@@ -36,6 +37,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final CitizenRepository citizenRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
@@ -107,12 +109,33 @@ public class AuthController {
 
         // Determine Role
         Role userRole;
-        if (registerRequest.getDepartmentCode() != null && !registerRequest.getDepartmentCode().isBlank()) {
+        String requestedRole = registerRequest.getRole();
+        String deptCode = registerRequest.getDepartmentCode();
+
+        if ("ROLE_ADMIN".equalsIgnoreCase(requestedRole) || "ADMIN".equalsIgnoreCase(requestedRole)) {
+            userRole = roleRepository.findByName(RoleType.ROLE_ADMIN)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(RoleType.ROLE_ADMIN).description("Platform Administrator").build()));
+            deptCode = null;
+        } else if ("ROLE_DEPARTMENT_OFFICER".equalsIgnoreCase(requestedRole) || "OFFICER".equalsIgnoreCase(requestedRole)
+                || (deptCode != null && !deptCode.isBlank())) {
             userRole = roleRepository.findByName(RoleType.ROLE_DEPARTMENT_OFFICER)
                 .orElseGet(() -> roleRepository.save(Role.builder().name(RoleType.ROLE_DEPARTMENT_OFFICER).description("Department Officer").build()));
+            if (deptCode == null || deptCode.isBlank()) {
+                deptCode = "REV";
+            }
         } else {
             userRole = roleRepository.findByName(RoleType.ROLE_CITIZEN)
                 .orElseGet(() -> roleRepository.save(Role.builder().name(RoleType.ROLE_CITIZEN).description("Citizen").build()));
+            deptCode = null;
+        }
+
+        String citizenId = registerRequest.getCitizenId();
+        if (userRole.getName() == RoleType.ROLE_CITIZEN) {
+            if (citizenId == null || citizenId.isBlank() || !citizenRepository.existsByCitizenId(citizenId)) {
+                citizenId = "MH-CIT-10001";
+            }
+        } else {
+            citizenId = null;
         }
 
         String maskedPhone = registerRequest.getPhone();
@@ -126,8 +149,8 @@ public class AuthController {
             .passwordHash(passwordEncoder.encode(registerRequest.getPassword()))
             .fullName(registerRequest.getFullName().trim())
             .phoneMasked(maskedPhone)
-            .departmentCode(registerRequest.getDepartmentCode())
-            .citizenId(registerRequest.getCitizenId())
+            .departmentCode(deptCode)
+            .citizenId(citizenId)
             .isActive(true)
             .roles(new HashSet<>(Collections.singletonList(userRole)))
             .build();

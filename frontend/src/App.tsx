@@ -53,30 +53,41 @@ const MainApplication: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Fetch background platform stats for modals
+  // Fetch background platform stats for modals (only for authorized admin users)
   useEffect(() => {
     if (!token || !isAuthenticated) return;
+    const isAdmin = user?.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_SYSTEM');
+    if (!isAdmin) return;
     fetch(`${API_BASE_URL}/api/stats`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setStatsData(data); })
       .catch(() => {});
-  }, [token, isAuthenticated]);
+  }, [token, isAuthenticated, user]);
 
-  // Redirect when user logs in
+  // Route authorization & redirect when user logs in or registers
   useEffect(() => {
     if (!isAuthenticated || !user) return;
     const isCitizen = user.roles?.includes('ROLE_CITIZEN');
     const isOfficer = user.roles?.some(r => r === 'ROLE_DEPARTMENT_OFFICER');
     const isAdmin = user.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_SYSTEM');
 
-    if (currentPath === '/' || currentPath === '/login') {
-      if (isCitizen) navigate('/citizen/dashboard');
+    const isOfficerRoute = currentPath.startsWith('/officer');
+    const isAdminRoute = currentPath.startsWith('/admin');
+
+    // Check if the current route is authorized for this user role
+    const isAuthorized = 
+      isAdmin || 
+      (isOfficer && !isAdminRoute) || 
+      (isCitizen && !isOfficerRoute && !isAdminRoute);
+
+    if (currentPath === '/' || currentPath === '/login' || !isAuthorized) {
+      if (isAdmin) navigate('/admin/dashboard');
       else if (isOfficer) navigate('/officer/dashboard');
-      else if (isAdmin) navigate('/admin/dashboard');
+      else if (isCitizen) navigate('/citizen/dashboard');
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, currentPath]);
 
   if (authLoading) {
     return (
@@ -90,8 +101,10 @@ const MainApplication: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage onSuccess={() => {
-      // Handled by reactive useEffect
+    return <LoginPage onSuccess={(targetRole?: string) => {
+      if (targetRole === 'ROLE_ADMIN') navigate('/admin/dashboard');
+      else if (targetRole === 'ROLE_DEPARTMENT_OFFICER') navigate('/officer/dashboard');
+      else navigate('/citizen/dashboard');
     }} />;
   }
 

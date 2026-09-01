@@ -31,6 +31,8 @@ public class RegisterRequest {
 
     private String phone;
 
+    private String role; // ROLE_CITIZEN, ROLE_DEPARTMENT_OFFICER, ROLE_ADMIN
+
     private String departmentCode; // For officer registrations (REV, AGR, WEL)
 
     private String citizenId; // e.g. MH-CIT-10001
