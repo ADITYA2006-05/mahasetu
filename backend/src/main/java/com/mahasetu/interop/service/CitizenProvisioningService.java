@@ -42,9 +42,9 @@ public class CitizenProvisioningService {
                 citizenId = "MH-CIT-10001";
             }
         }
-        final String effectiveCitizenId = citizenId.trim();
+        final String effectiveCitizenId = citizenId.trim().toUpperCase();
 
-        Optional<Citizen> existing = citizenRepository.findByCitizenId(effectiveCitizenId);
+        Optional<Citizen> existing = citizenRepository.findByCitizenIdIgnoreCase(effectiveCitizenId);
         if (existing.isPresent()) {
             return existing.get();
         }

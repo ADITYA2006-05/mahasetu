@@ -51,7 +51,7 @@ public class IntegrationService {
             correlationRequestId, citizenId, requestedDepts.size(), requestingUser, purpose);
 
         // 2. Validate Master Citizen Existence in Canonical Registry or Auto-provision
-        Citizen citizen = citizenRepository.findByCitizenId(citizenId)
+        Citizen citizen = citizenRepository.findByCitizenIdIgnoreCase(citizenId)
             .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(citizenId, null, null, null));
 
         // 3. Privacy & Consent Gatekeeper: Validate Citizen Active Consent & Data Scope Coverage

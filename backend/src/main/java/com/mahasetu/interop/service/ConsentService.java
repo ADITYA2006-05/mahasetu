@@ -62,9 +62,13 @@ public class ConsentService {
             }
         }
 
+        final String targetCitizenIdFinal = targetCitizenId != null && !targetCitizenId.isBlank()
+                ? targetCitizenId.trim().toUpperCase()
+                : "MH-CIT-10001";
+
         // Validate Citizen exists in canonical registry or auto-provision
-        Citizen citizen = citizenRepository.findByCitizenId(targetCitizenId)
-                .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(targetCitizenId, authUser.getFullName(), authUser.getEmail(), authUser.getPhoneMasked()));
+        Citizen citizen = citizenRepository.findByCitizenIdIgnoreCase(targetCitizenIdFinal)
+                .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(targetCitizenIdFinal, authUser.getFullName(), authUser.getEmail(), authUser.getPhoneMasked()));
 
         String consentId = "CNS-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
         OffsetDateTime now = OffsetDateTime.now();

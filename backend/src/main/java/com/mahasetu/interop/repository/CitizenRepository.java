@@ -11,7 +11,9 @@ import java.util.Optional;
 @Repository
 public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     Optional<Citizen> findByCitizenId(String citizenId);
+    Optional<Citizen> findByCitizenIdIgnoreCase(String citizenId);
     boolean existsByCitizenId(String citizenId);
+    boolean existsByCitizenIdIgnoreCase(String citizenId);
 
     @Query("SELECT c.district.districtCode, c.district.name, COUNT(c) FROM Citizen c GROUP BY c.district.districtCode, c.district.name ORDER BY COUNT(c) DESC")
     List<Object[]> countCitizensGroupedByDistrict();

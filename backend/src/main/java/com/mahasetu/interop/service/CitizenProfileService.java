@@ -45,8 +45,8 @@ public class CitizenProfileService {
     }
 
     private CitizenProfileDto buildCitizenProfileByCitizenId(String citizenId, String usernameForConsents) {
-        String cleanId = (citizenId != null && !citizenId.isBlank()) ? citizenId.trim() : "MH-CIT-10001";
-        Citizen citizen = citizenRepository.findByCitizenId(cleanId)
+        String cleanId = (citizenId != null && !citizenId.isBlank()) ? citizenId.trim().toUpperCase() : "MH-CIT-10001";
+        Citizen citizen = citizenRepository.findByCitizenIdIgnoreCase(cleanId)
                 .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(cleanId, null, null, null));
 
         String effectiveCitizenId = citizen.getCitizenId();

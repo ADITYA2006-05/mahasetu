@@ -139,7 +139,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
         setLocalError('Please enter a valid 12-digit Aadhaar number (e.g. 5482-9012-3456)');
         return;
       }
-      payload.citizenId = regCitizenId.trim() || `MH-CIT-${cleanAadhaar.slice(-5)}`;
+      payload.citizenId = (regCitizenId.trim() || `MH-CIT-${cleanAadhaar.slice(-5)}`).toUpperCase();
       payload.aadhaarNumber = regAadhaar.trim();
     }
 

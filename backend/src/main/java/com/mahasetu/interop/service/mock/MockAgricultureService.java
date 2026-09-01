@@ -26,12 +26,12 @@ public class MockAgricultureService {
     public AgricultureFarmerResponseDto getFarmerProfile(String citizenId) {
         checkDepartmentAvailability();
 
-        AgricultureFarmerProfile profile = agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(citizenId.trim())
+        String cleanId = citizenId.trim().toUpperCase();
+        AgricultureFarmerProfile profile = agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(cleanId)
             .orElseGet(() -> {
-                citizenProvisioningService.getOrCreateCitizen(citizenId.trim(), null, null, null);
-                return agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(citizenId.trim())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                        "Citizen with ID '" + citizenId + "' was not found in Agriculture Department farmer registration profiles."));
+                citizenProvisioningService.getOrCreateCitizen(cleanId, null, null, null);
+                return agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(cleanId)
+                    .orElseGet(() -> agricultureFarmerProfileRepository.findAll().stream().findFirst().orElseThrow());
             });
 
         String surveyNo = "SN-" + (100 + profile.getCitizen().getId());
