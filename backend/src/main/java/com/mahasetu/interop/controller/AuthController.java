@@ -8,6 +8,7 @@ import com.mahasetu.interop.repository.CitizenRepository;
 import com.mahasetu.interop.repository.RoleRepository;
 import com.mahasetu.interop.repository.UserRepository;
 import com.mahasetu.interop.security.JwtTokenProvider;
+import com.mahasetu.interop.service.CitizenProvisioningService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final CitizenRepository citizenRepository;
+    private final CitizenProvisioningService citizenProvisioningService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
@@ -131,9 +133,12 @@ public class AuthController {
 
         String citizenId = registerRequest.getCitizenId();
         if (userRole.getName() == RoleType.ROLE_CITIZEN) {
-            if (citizenId == null || citizenId.isBlank() || !citizenRepository.existsByCitizenId(citizenId)) {
+            if (citizenId == null || citizenId.isBlank()) {
                 citizenId = "MH-CIT-10001";
+            } else {
+                citizenId = citizenId.trim();
             }
+            citizenProvisioningService.getOrCreateCitizen(citizenId, registerRequest.getFullName(), email, registerRequest.getPhone());
         } else {
             citizenId = null;
         }

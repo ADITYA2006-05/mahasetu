@@ -20,6 +20,7 @@ public class CitizenProfileService {
 
     private final CitizenRepository citizenRepository;
     private final UserRepository userRepository;
+    private final CitizenProvisioningService citizenProvisioningService;
     private final DepartmentIdentifierRepository departmentIdentifierRepository;
     private final RevenueLandRecordRepository revenueLandRecordRepository;
     private final AgricultureFarmerProfileRepository agricultureFarmerProfileRepository;
@@ -27,7 +28,7 @@ public class CitizenProfileService {
     private final ConsentService consentService;
     private final AuditLogService auditLogService;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CitizenProfileDto getCitizenProfile(String username) {
         String citizenId = "MH-CIT-10001";
         Optional<User> userOpt = userRepository.findByUsernameOrEmail(username);
@@ -38,18 +39,17 @@ public class CitizenProfileService {
         return buildCitizenProfileByCitizenId(citizenId, username);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CitizenProfileDto getCitizenProfileById(String citizenId) {
         return buildCitizenProfileByCitizenId(citizenId, "admin");
     }
 
     private CitizenProfileDto buildCitizenProfileByCitizenId(String citizenId, String usernameForConsents) {
-        Citizen citizen = citizenRepository.findByCitizenId(citizenId)
-                .or(() -> citizenRepository.findByCitizenId("MH-CIT-10001"))
-                .or(() -> citizenRepository.findAll().stream().findFirst())
-                .orElse(null);
+        String cleanId = (citizenId != null && !citizenId.isBlank()) ? citizenId.trim() : "MH-CIT-10001";
+        Citizen citizen = citizenRepository.findByCitizenId(cleanId)
+                .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(cleanId, null, null, null));
 
-        String effectiveCitizenId = (citizen != null) ? citizen.getCitizenId() : (citizenId != null ? citizenId : "MH-CIT-10001");
+        String effectiveCitizenId = citizen.getCitizenId();
 
         // Department Identifiers
         Map<String, String> deptIdentifiers = new LinkedHashMap<>();

@@ -22,16 +22,21 @@ public class MockRevenueService {
 
     private final RevenueLandRecordRepository revenueLandRecordRepository;
     private final DepartmentStateService departmentStateService;
+    private final com.mahasetu.interop.service.CitizenProvisioningService citizenProvisioningService;
 
     private static final double HECTARE_TO_ACRES = 2.47105;
 
-    @Transactional(readOnly = true, noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
+    @Transactional(noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
     public RevenueCitizenResponseDto getCitizenLandRecord(String citizenId) {
         checkDepartmentAvailability();
 
         RevenueLandRecord record = revenueLandRecordRepository.findFirstByCitizen_CitizenId(citizenId.trim())
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Citizen with ID '" + citizenId + "' was not found in Revenue Department (7/12) records."));
+            .orElseGet(() -> {
+                citizenProvisioningService.getOrCreateCitizen(citizenId.trim(), null, null, null);
+                return revenueLandRecordRepository.findFirstByCitizen_CitizenId(citizenId.trim())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                        "Citizen with ID '" + citizenId + "' was not found in Revenue Department (7/12) records."));
+            });
 
         double totalHa = record.getTotalAreaHectares() != null ? record.getTotalAreaHectares().doubleValue() : 0.0;
         double acres = BigDecimal.valueOf(totalHa * HECTARE_TO_ACRES)

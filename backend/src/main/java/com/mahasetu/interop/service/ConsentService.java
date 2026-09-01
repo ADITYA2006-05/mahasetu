@@ -31,13 +31,14 @@ public class ConsentService {
     private final ConsentRepository consentRepository;
     private final CitizenRepository citizenRepository;
     private final UserRepository userRepository;
+    private final CitizenProvisioningService citizenProvisioningService;
 
     /**
      * Creates a new citizen consent agreement with data scopes and validity period.
      */
     @Transactional
     public ConsentDto createConsent(CreateConsentDto dto, String authenticatedUsername) {
-        User authUser = userRepository.findByUsername(authenticatedUsername)
+        User authUser = userRepository.findByUsernameOrEmail(authenticatedUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found: " + authenticatedUsername));
 
         boolean isPrivileged = authUser.getRoles().stream().anyMatch(r -> 
@@ -61,9 +62,9 @@ public class ConsentService {
             }
         }
 
-        // Validate Citizen exists in canonical registry
+        // Validate Citizen exists in canonical registry or auto-provision
         Citizen citizen = citizenRepository.findByCitizenId(targetCitizenId)
-                .orElseThrow(() -> new ResourceNotFoundException("Citizen with ID '" + targetCitizenId + "' not found."));
+                .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(targetCitizenId, authUser.getFullName(), authUser.getEmail(), authUser.getPhoneMasked()));
 
         String consentId = "CNS-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
         OffsetDateTime now = OffsetDateTime.now();

@@ -31,6 +31,7 @@ public class IntegrationService {
     private final SchemaMappingService schemaMappingService;
     private final ConsentService consentService;
     private final AuditLogService auditLogService;
+    private final CitizenProvisioningService citizenProvisioningService;
 
     /**
      * Executes a federated cross-department integration request and applies dynamic canonical schema mapping.
@@ -49,10 +50,9 @@ public class IntegrationService {
         log.info("Integration Service: Initiating federated request [{}] for citizen [{}] with [{}] departments by user [{}] (Purpose: [{}])",
             correlationRequestId, citizenId, requestedDepts.size(), requestingUser, purpose);
 
-        // 2. Validate Master Citizen Existence in Canonical Registry
+        // 2. Validate Master Citizen Existence in Canonical Registry or Auto-provision
         Citizen citizen = citizenRepository.findByCitizenId(citizenId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Citizen with ID '" + citizenId + "' was not found in the Master Canonical Registry."));
+            .orElseGet(() -> citizenProvisioningService.getOrCreateCitizen(citizenId, null, null, null));
 
         // 3. Privacy & Consent Gatekeeper: Validate Citizen Active Consent & Data Scope Coverage
         Consent activeConsent;

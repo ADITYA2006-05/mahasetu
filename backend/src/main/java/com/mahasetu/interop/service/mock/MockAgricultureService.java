@@ -20,14 +20,19 @@ public class MockAgricultureService {
 
     private final AgricultureFarmerProfileRepository agricultureFarmerProfileRepository;
     private final DepartmentStateService departmentStateService;
+    private final com.mahasetu.interop.service.CitizenProvisioningService citizenProvisioningService;
 
-    @Transactional(readOnly = true, noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
+    @Transactional(noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
     public AgricultureFarmerResponseDto getFarmerProfile(String citizenId) {
         checkDepartmentAvailability();
 
         AgricultureFarmerProfile profile = agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(citizenId.trim())
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Citizen with ID '" + citizenId + "' was not found in Agriculture Department farmer registration profiles."));
+            .orElseGet(() -> {
+                citizenProvisioningService.getOrCreateCitizen(citizenId.trim(), null, null, null);
+                return agricultureFarmerProfileRepository.findFirstByCitizen_CitizenId(citizenId.trim())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                        "Citizen with ID '" + citizenId + "' was not found in Agriculture Department farmer registration profiles."));
+            });
 
         String surveyNo = "SN-" + (100 + profile.getCitizen().getId());
         String usage = profile.getLandholdingHectares() != null ? profile.getLandholdingHectares().toPlainString() + " Ha" : "0.0000 Ha";

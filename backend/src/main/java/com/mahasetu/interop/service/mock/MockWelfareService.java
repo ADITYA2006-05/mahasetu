@@ -20,14 +20,19 @@ public class MockWelfareService {
 
     private final WelfareBeneficiaryRecordRepository welfareBeneficiaryRecordRepository;
     private final DepartmentStateService departmentStateService;
+    private final com.mahasetu.interop.service.CitizenProvisioningService citizenProvisioningService;
 
-    @Transactional(readOnly = true, noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
+    @Transactional(noRollbackFor = {ServiceUnavailableException.class, ResourceNotFoundException.class})
     public WelfareBeneficiaryResponseDto getBeneficiaryRecord(String citizenId) {
         checkDepartmentAvailability();
 
         WelfareBeneficiaryRecord record = welfareBeneficiaryRecordRepository.findFirstByCitizen_CitizenId(citizenId.trim())
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Citizen with ID '" + citizenId + "' was not found in Social Justice & Welfare Department beneficiary records."));
+            .orElseGet(() -> {
+                citizenProvisioningService.getOrCreateCitizen(citizenId.trim(), null, null, null);
+                return welfareBeneficiaryRecordRepository.findFirstByCitizen_CitizenId(citizenId.trim())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                        "Citizen with ID '" + citizenId + "' was not found in Social Justice & Welfare Department beneficiary records."));
+            });
 
         String appStatus = "REJECTED".equalsIgnoreCase(record.getDisbursementStatus()) ? "REJECTED" : "APPROVED";
         double amount = record.getMonthlyStipendInr() != null ? record.getMonthlyStipendInr().doubleValue() : 0.0;
