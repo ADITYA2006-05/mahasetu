@@ -104,8 +104,12 @@ public class ConsentService {
      */
     @Transactional(readOnly = true)
     public List<ConsentDto> getConsentsForUser(String authenticatedUsername) {
-        User authUser = userRepository.findByUsername(authenticatedUsername)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + authenticatedUsername));
+        User authUser = userRepository.findByUsernameOrEmail(authenticatedUsername)
+                .orElse(null);
+
+        if (authUser == null) {
+            return Collections.emptyList();
+        }
 
         boolean isPrivileged = authUser.getRoles().stream().anyMatch(r -> 
                 r.getName() == RoleType.ROLE_ADMIN || r.getName() == RoleType.ROLE_SYSTEM || r.getName() == RoleType.ROLE_DEPARTMENT_OFFICER);

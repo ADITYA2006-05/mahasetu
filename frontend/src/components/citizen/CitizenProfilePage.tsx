@@ -33,7 +33,10 @@ export const CitizenProfilePage: React.FC = () => {
           Accept: 'application/json',
         },
       });
-      if (!res.ok) throw new Error('Failed to load profile details');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to load profile details (HTTP ${res.status})`);
+      }
       const data: CitizenProfileData = await res.json();
       setProfile(data);
     } catch (err: any) {

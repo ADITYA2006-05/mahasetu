@@ -37,7 +37,10 @@ export const CitizenDashboardPage: React.FC<CitizenDashboardPageProps> = ({ onNa
           Accept: 'application/json',
         },
       });
-      if (!res.ok) throw new Error('Failed to fetch citizen profile and entitlements');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to fetch citizen profile and entitlements (HTTP ${res.status})`);
+      }
       const data: CitizenProfileData = await res.json();
       setProfile(data);
     } catch (err: any) {
