@@ -19,6 +19,7 @@ public class UserProfileDto {
     private String phoneMasked;
     private String departmentCode;
     private String citizenId;
+    private String aadhaarMasked;
     private List<String> roles;
     private boolean active;
 }

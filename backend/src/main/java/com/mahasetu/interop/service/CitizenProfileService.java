@@ -158,7 +158,9 @@ public class CitizenProfileService {
         String talName = (citizen != null && citizen.getTaluka() != null) ? citizen.getTaluka().getName() : "Haveli";
         String vilName = (citizen != null && citizen.getVillage() != null) ? citizen.getVillage().getName() : "Wagholi";
         String fullAddress = "House No. 104, " + vilName + ", Taluka " + talName + ", District " + distName + ", Maharashtra";
-        String syntheticAadhaar = "XXXX-XXXX-" + (effectiveCitizenId.length() >= 4 ? effectiveCitizenId.substring(effectiveCitizenId.length() - 4) : "1001");
+        String syntheticAadhaar = (citizen != null && citizen.getAadhaarMasked() != null && !citizen.getAadhaarMasked().isBlank())
+                ? citizen.getAadhaarMasked()
+                : "XXXX-XXXX-" + (effectiveCitizenId.length() >= 4 ? effectiveCitizenId.substring(effectiveCitizenId.length() - 4) : "1001");
 
         String fullName = citizen != null ? citizen.getFullName() : userRepository.findByUsernameOrEmail(usernameForConsents).map(User::getFullName).orElse("Citizen Beneficiary");
 

@@ -6,6 +6,7 @@ export interface UserProfile {
   phoneMasked?: string;
   departmentCode?: string;
   citizenId?: string;
+  aadhaarMasked?: string;
   roles: string[];
   active: boolean;
 }

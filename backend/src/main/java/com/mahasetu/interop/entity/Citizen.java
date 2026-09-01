@@ -40,6 +40,9 @@ public class Citizen {
     @Column(name = "masked_email", nullable = false, length = 100)
     private String maskedEmail;
 
+    @Column(name = "aadhaar_masked", length = 30)
+    private String aadhaarMasked;
+
     @Column(name = "annual_income_inr", nullable = false, precision = 12, scale = 2)
     @Builder.Default
     private BigDecimal annualIncomeInr = BigDecimal.ZERO;

@@ -132,13 +132,18 @@ public class AuthController {
         }
 
         String citizenId = registerRequest.getCitizenId();
+        String rawAadhaar = registerRequest.getAadhaarNumber() != null ? registerRequest.getAadhaarNumber().replaceAll("[^0-9]", "") : "";
+        String maskedAadhaar = rawAadhaar.length() >= 4 
+            ? "XXXX-XXXX-" + rawAadhaar.substring(rawAadhaar.length() - 4) 
+            : null;
+
         if (userRole.getName() == RoleType.ROLE_CITIZEN) {
             if (citizenId == null || citizenId.isBlank()) {
-                citizenId = "MH-CIT-10001";
+                citizenId = rawAadhaar.length() >= 4 ? "MH-CIT-" + rawAadhaar.substring(Math.max(0, rawAadhaar.length() - 5)) : "MH-CIT-10001";
             } else {
                 citizenId = citizenId.trim();
             }
-            citizenProvisioningService.getOrCreateCitizen(citizenId, registerRequest.getFullName(), email, registerRequest.getPhone());
+            citizenProvisioningService.getOrCreateCitizen(citizenId, registerRequest.getFullName(), email, registerRequest.getPhone(), registerRequest.getAadhaarNumber());
         } else {
             citizenId = null;
         }
@@ -156,6 +161,7 @@ public class AuthController {
             .phoneMasked(maskedPhone)
             .departmentCode(deptCode)
             .citizenId(citizenId)
+            .aadhaarMasked(maskedAadhaar)
             .isActive(true)
             .roles(new HashSet<>(Collections.singletonList(userRole)))
             .build();
@@ -204,6 +210,7 @@ public class AuthController {
             .phoneMasked(user.getPhoneMasked())
             .departmentCode(user.getDepartmentCode())
             .citizenId(user.getCitizenId())
+            .aadhaarMasked(user.getAadhaarMasked())
             .roles(roles)
             .active(user.isEnabled())
             .build();

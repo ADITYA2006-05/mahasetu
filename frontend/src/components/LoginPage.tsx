@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Key, UserCheck, AlertCircle, ArrowRight, Building2, UserPlus, Lock, User, CheckCircle2, Shield } from 'lucide-react';
+import { Key, UserCheck, AlertCircle, ArrowRight, Building2, UserPlus, Lock, User, CheckCircle2, Shield, Fingerprint } from 'lucide-react';
 
 interface LoginPageProps {
   onSuccess?: (targetRole?: string) => void;
@@ -22,6 +22,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const [regFullName, setRegFullName] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regCitizenId, setRegCitizenId] = useState('');
+  const [regAadhaar, setRegAadhaar] = useState('');
+
+  const formatAadhaarInput = (val: string) => {
+    const raw = val.replace(/[^0-9]/g, '').slice(0, 12);
+    const parts = [];
+    for (let i = 0; i < raw.length; i += 4) {
+      parts.push(raw.slice(i, i + 4));
+    }
+    setRegAadhaar(parts.join('-'));
+  };
 
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -124,7 +134,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     if (regRole === 'ROLE_DEPARTMENT_OFFICER') {
       payload.departmentCode = regDeptCode;
     } else if (regRole === 'ROLE_CITIZEN') {
-      payload.citizenId = regCitizenId.trim() || 'MH-CIT-10001';
+      const cleanAadhaar = regAadhaar.replace(/[^0-9]/g, '');
+      if (!cleanAadhaar || cleanAadhaar.length !== 12) {
+        setLocalError('Please enter a valid 12-digit Aadhaar number (e.g. 5482-9012-3456)');
+        return;
+      }
+      payload.citizenId = regCitizenId.trim() || `MH-CIT-${cleanAadhaar.slice(-5)}`;
+      payload.aadhaarNumber = regAadhaar.trim();
     }
 
     const ok = await register(payload);
@@ -379,25 +395,51 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
                   </div>
                 )}
 
-                {/* Conditional Citizen ID for Citizens */}
+                {/* Conditional Citizen ID & Aadhaar for Citizens */}
                 {regRole === 'ROLE_CITIZEN' && (
-                  <div className="p-3 bg-sky-50/80 border border-sky-200 rounded-lg">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-black text-sky-950">
-                        Citizen ID (Canonical Mapping)
-                      </label>
-                      <span className="text-[10px] text-sky-700 font-bold">Auto-links records</span>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-indigo-50/80 border border-indigo-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-black text-indigo-950 flex items-center gap-1.5">
+                          <Fingerprint className="w-4 h-4 text-indigo-700" />
+                          Aadhaar Number (12-Digit UID) *
+                        </label>
+                        <span className="text-[10px] text-indigo-800 font-bold bg-indigo-100 px-2 py-0.5 rounded border border-indigo-300">
+                          DPDP Masked
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        maxLength={14}
+                        value={regAadhaar}
+                        onChange={(e) => formatAadhaarInput(e.target.value)}
+                        placeholder="XXXX-XXXX-XXXX (e.g. 5482-9012-3456)"
+                        className="w-full bg-white border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-mono font-bold focus:outline-none focus:border-indigo-600"
+                      />
+                      <p className="text-[10px] text-indigo-900 mt-1 font-medium">
+                        Used to establish cross-department identity. Stored strictly in masked format (XXXX-XXXX-3456) in compliance with DPDP.
+                      </p>
                     </div>
-                    <input
-                      type="text"
-                      value={regCitizenId}
-                      onChange={(e) => setRegCitizenId(e.target.value)}
-                      placeholder="MH-CIT-10001 (Default Seeded Record)"
-                      className="w-full bg-white border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
-                    />
-                    <p className="text-[10px] text-sky-800 mt-1 font-medium">
-                      Defaults to MH-CIT-10001 with pre-federated land, agriculture, and welfare ledgers.
-                    </p>
+
+                    <div className="p-3 bg-sky-50/80 border border-sky-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-black text-sky-950">
+                          Citizen ID (Canonical Mapping)
+                        </label>
+                        <span className="text-[10px] text-sky-700 font-bold">Auto-derived</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={regCitizenId}
+                        onChange={(e) => setRegCitizenId(e.target.value)}
+                        placeholder={regAadhaar.replace(/[^0-9]/g, '').length >= 4 ? `MH-CIT-${regAadhaar.replace(/[^0-9]/g, '').slice(-5)}` : "MH-CIT-10001"}
+                        className="w-full bg-white border border-slate-400 rounded-lg px-3 py-2 text-xs text-slate-950 font-bold focus:outline-none focus:border-amber-600"
+                      />
+                      <p className="text-[10px] text-sky-800 mt-1 font-medium">
+                        Optional: Defaults to MH-CIT-{regAadhaar.replace(/[^0-9]/g, '').slice(-5) || '10001'} with pre-federated land, agriculture, and welfare ledgers.
+                      </p>
+                    </div>
                   </div>
                 )}
 

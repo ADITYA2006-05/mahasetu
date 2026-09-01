@@ -36,4 +36,6 @@ public class RegisterRequest {
     private String departmentCode; // For officer registrations (REV, AGR, WEL)
 
     private String citizenId; // e.g. MH-CIT-10001
+
+    private String aadhaarNumber; // 12-digit Aadhaar e.g. 5482-9012-3456
 }

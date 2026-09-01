@@ -48,6 +48,9 @@ public class User implements UserDetails {
     @Column(name = "citizen_id", length = 30)
     private String citizenId; // e.g. MH-CIT-10001 (for citizens)
 
+    @Column(name = "aadhaar_masked", length = 30)
+    private String aadhaarMasked; // e.g. XXXX-XXXX-1234
+
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;

@@ -29,8 +29,18 @@ public class CitizenProvisioningService {
 
     @Transactional
     public Citizen getOrCreateCitizen(String citizenId, String fullName, String email, String phone) {
+        return getOrCreateCitizen(citizenId, fullName, email, phone, null);
+    }
+
+    @Transactional
+    public Citizen getOrCreateCitizen(String citizenId, String fullName, String email, String phone, String aadhaarNumber) {
         if (citizenId == null || citizenId.isBlank()) {
-            citizenId = "MH-CIT-10001";
+            if (aadhaarNumber != null && !aadhaarNumber.isBlank()) {
+                String digits = aadhaarNumber.replaceAll("[^0-9]", "");
+                citizenId = digits.length() >= 4 ? "MH-CIT-" + digits.substring(Math.max(0, digits.length() - 5)) : "MH-CIT-10001";
+            } else {
+                citizenId = "MH-CIT-10001";
+            }
         }
         final String effectiveCitizenId = citizenId.trim();
 
@@ -58,6 +68,11 @@ public class CitizenProvisioningService {
         String cleanEmail = (email != null && !email.isBlank()) ? email.trim() : "citizen." + effectiveCitizenId.toLowerCase() + "@gov-synthetic.in";
         String cleanPhone = (phone != null && !phone.isBlank()) ? phone.trim() : "+91-XXXXX-12001";
 
+        String digits = (aadhaarNumber != null) ? aadhaarNumber.replaceAll("[^0-9]", "") : "";
+        String cleanAadhaar = digits.length() >= 4 
+            ? "XXXX-XXXX-" + digits.substring(digits.length() - 4)
+            : "XXXX-XXXX-" + (effectiveCitizenId.length() >= 4 ? effectiveCitizenId.substring(effectiveCitizenId.length() - 4) : "1001");
+
         Citizen citizen = Citizen.builder()
                 .citizenId(effectiveCitizenId)
                 .fullName(cleanName)
@@ -65,6 +80,7 @@ public class CitizenProvisioningService {
                 .dateOfBirth(LocalDate.of(1985, 6, 15))
                 .maskedPhone(cleanPhone)
                 .maskedEmail(cleanEmail)
+                .aadhaarMasked(cleanAadhaar)
                 .annualIncomeInr(BigDecimal.valueOf(75000.00))
                 .occupation("Farmer / Entrepreneur")
                 .village(village)

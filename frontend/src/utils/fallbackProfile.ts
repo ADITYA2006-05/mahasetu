@@ -8,7 +8,7 @@ export const getFallbackCitizenProfile = (user: UserProfile | null): CitizenProf
   return {
     citizenId: effectiveId,
     fullName: name,
-    aadhaarHash: `XXXX-XXXX-${cleanNum.slice(-4) || '1001'}`,
+    aadhaarHash: user?.aadhaarMasked || `XXXX-XXXX-${cleanNum.slice(-4) || '1001'}`,
     dob: '1982-05-14',
     gender: 'MALE',
     mobileNumber: user?.phoneMasked || '+91-XXXXX-12001',
