@@ -16,6 +16,7 @@ import { AdminSchemaMappingsPage } from './components/AdminSchemaMappingsPage';
 import { AdminAuditLogsPage } from './components/AdminAuditLogsPage';
 import { AdminApiHealthPage } from './components/admin/AdminApiHealthPage';
 import { DemoPage } from './components/demo/DemoPage';
+import { UserManualPage } from './components/UserManualPage';
 import { DataExplorerModal } from './components/DataExplorerModal';
 import { ApiInspectorModal } from './components/ApiInspectorModal';
 import { PlatformStats } from './types';
@@ -78,6 +79,8 @@ const MainApplication: React.FC = () => {
 
     // Check if the current route is authorized for this user role
     const isAuthorized = 
+      currentPath === '/manual' ||
+      currentPath === '/demo' ||
       isAdmin || 
       (isOfficer && !isAdminRoute) || 
       (isCitizen && !isOfficerRoute && !isAdminRoute);
@@ -101,11 +104,22 @@ const MainApplication: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage onSuccess={(targetRole?: string) => {
-      if (targetRole === 'ROLE_ADMIN') navigate('/admin/dashboard');
-      else if (targetRole === 'ROLE_DEPARTMENT_OFFICER') navigate('/officer/dashboard');
-      else navigate('/citizen/dashboard');
-    }} />;
+    if (currentPath === '/manual') {
+      return (
+        <div className="min-h-screen bg-slate-100 text-slate-900 p-4 sm:p-6 lg:p-8">
+          <UserManualPage onNavigate={navigate} isPublicAccess={true} />
+        </div>
+      );
+    }
+
+    return <LoginPage 
+      onNavigate={navigate}
+      onSuccess={(targetRole?: string) => {
+        if (targetRole === 'ROLE_ADMIN') navigate('/admin/dashboard');
+        else if (targetRole === 'ROLE_DEPARTMENT_OFFICER') navigate('/officer/dashboard');
+        else navigate('/citizen/dashboard');
+      }} 
+    />;
   }
 
   const isCitizen = user?.roles?.includes('ROLE_CITIZEN');
@@ -178,6 +192,11 @@ const MainApplication: React.FC = () => {
     // Demo Route
     if (currentPath === '/demo') {
       return <DemoPage />;
+    }
+
+    // Manual Route
+    if (currentPath === '/manual') {
+      return <UserManualPage onNavigate={navigate} />;
     }
 
     // 404 Fallback

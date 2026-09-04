@@ -14,7 +14,8 @@ import {
   PlayCircle, 
   LogOut, 
   FileText,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -333,18 +334,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* INTEROPERABILITY SHOWCASE (Available to all) */}
+          {/* HELP & RESOURCES (Available to all) */}
           <div className="space-y-1 pt-2 border-t border-slate-800/80">
             <div className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              Interactive Showcase
+              Help & Resources
             </div>
+
+            <button
+              onClick={() => handleNavClick('/manual')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold transition-all ${
+                currentPath === '/manual'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20'
+                  : 'text-amber-400 hover:bg-amber-500/10'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <BookOpen className="w-4 h-4" />
+                <span>User Manual</span>
+              </div>
+              <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-500/30">
+                Guide
+              </span>
+            </button>
 
             <button
               onClick={() => handleNavClick('/demo')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold transition-all ${
                 currentPath === '/demo'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-lg shadow-amber-500/20'
-                  : 'text-amber-400 hover:bg-amber-500/10'
+                  : 'text-slate-300 hover:bg-slate-900 hover:text-white'
               }`}
             >
               <div className="flex items-center gap-2.5">

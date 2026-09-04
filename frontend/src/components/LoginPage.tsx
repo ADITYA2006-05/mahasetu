@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Key, UserCheck, AlertCircle, ArrowRight, Building2, UserPlus, Lock, User, CheckCircle2, Shield, Fingerprint } from 'lucide-react';
+import { Key, UserCheck, AlertCircle, ArrowRight, Building2, UserPlus, Lock, User, CheckCircle2, Shield, Fingerprint, BookOpen } from 'lucide-react';
 
 interface LoginPageProps {
   onSuccess?: (targetRole?: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onNavigate }) => {
   const { login, register, error, clearError, isLoading } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'demo' | 'login' | 'register'>('demo');
@@ -162,6 +163,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
               <span className="text-xs text-slate-800 font-bold hidden sm:inline ml-2">| State Interoperability Platform</span>
             </div>
           </div>
+
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('/manual')}
+              className="px-3 py-1.5 rounded-lg bg-slate-900 text-amber-400 hover:bg-slate-800 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Platform User Manual</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -227,8 +238,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           {/* Tab 1: Demo Accounts Grid */}
           {activeTab === 'demo' && (
             <div className="p-6 sm:p-8 space-y-3">
-              <div className="text-xs text-slate-900 font-extrabold mb-2">
+              <div className="text-xs text-slate-900 font-extrabold mb-1">
                 Click on any authorized role below to sign in instantly with synthetic test credentials:
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-950 font-medium mb-3">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>First time here? Read the step-by-step user manual for complete role workflows.</span>
+                </div>
+                {onNavigate && (
+                  <button
+                    onClick={() => onNavigate('/manual')}
+                    className="text-amber-800 hover:text-amber-950 font-black underline shrink-0 cursor-pointer"
+                  >
+                    View Manual &rarr;
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
